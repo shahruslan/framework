@@ -20,8 +20,7 @@ class RetryCommand extends Command
      */
     protected $signature = 'queue:retry
                             {id?* : The ID of the failed job or "all" to retry all jobs}
-                            {--queue= : Retry all of the failed jobs for the specified queue}
-                            {--range=* : Range of job IDs (numeric) to be retried}';
+                            {--queue= : Retry all of the failed jobs for the specified queue}';
 
     /**
      * The name of the console command.
@@ -88,10 +87,6 @@ class RetryCommand extends Command
             return $this->getJobIdsByQueue($queue);
         }
 
-        if ($ranges = (array) $this->option('range')) {
-            $ids = array_merge($ids, $this->getJobIdsByRanges($ranges));
-        }
-
         return array_values(array_filter(array_unique($ids)));
     }
 
@@ -110,25 +105,6 @@ class RetryCommand extends Command
 
         if (count($ids) === 0) {
             $this->components->error("Unable to find failed jobs for queue [{$queue}].");
-        }
-
-        return $ids;
-    }
-
-    /**
-     * Get the job IDs ranges, if applicable.
-     *
-     * @param  array  $ranges
-     * @return array
-     */
-    protected function getJobIdsByRanges(array $ranges)
-    {
-        $ids = [];
-
-        foreach ($ranges as $range) {
-            if (preg_match('/^[0-9]+\-[0-9]+$/', $range)) {
-                $ids = array_merge($ids, range(...explode('-', $range)));
-            }
         }
 
         return $ids;
